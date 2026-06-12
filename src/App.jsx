@@ -45,7 +45,6 @@ const StorefrontLayout = () => {
       <Navbar />
       <main className="flex-grow">
         <Routes>
-          <ScrollToTop />
           <Route path="/" element={<Home />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/products/:slug" element={<ProductDetail />} />
@@ -87,6 +86,8 @@ function App() {
     <AuthProvider>
       <CartProvider>
         <Router>
+          <ScrollToTop />
+
           <Routes>
             {/* Storefront Layout */}
             <Route path="/*" element={<StorefrontLayout />} />
