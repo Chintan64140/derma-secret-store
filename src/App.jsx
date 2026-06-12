@@ -1,37 +1,42 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import { CartProvider } from './context/CartContext';
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import { CartProvider } from "./context/CartContext";
 
 // Components
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
-import SupportWidget from './components/SupportWidget';
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import SupportWidget from "./components/SupportWidget";
 
 // Pages
-import Home from './pages/Home';
-import Shop from './pages/Shop';
-import ProductDetail from './pages/ProductDetail';
-import Cart from './pages/Cart';
-import Checkout from './pages/Checkout';
-import CheckoutAddress from './pages/CheckoutAddress';
-import CheckoutPayment from './pages/CheckoutPayment';
-import CheckoutConfirm from './pages/CheckoutConfirm';
-import CheckoutSuccess from './pages/CheckoutSuccess';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
-import Profile from './pages/Profile';
-import UpdateProfile from './pages/UpdateProfile';
-import ChangePassword from './pages/ChangePassword';
-import Categories from './pages/Categories';
-import CategoryDetail from './pages/CategoryDetail';
-import About from './pages/About';
-import Contact from './pages/Contact';
-import Orders from './pages/Orders';
-import OrderDetail from './pages/OrderDetail';
-
+import Home from "./pages/Home";
+import Shop from "./pages/Shop";
+import ProductDetail from "./pages/ProductDetail";
+import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
+import CheckoutAddress from "./pages/CheckoutAddress";
+import CheckoutPayment from "./pages/CheckoutPayment";
+import CheckoutConfirm from "./pages/CheckoutConfirm";
+import CheckoutSuccess from "./pages/CheckoutSuccess";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import Profile from "./pages/Profile";
+import UpdateProfile from "./pages/UpdateProfile";
+import ChangePassword from "./pages/ChangePassword";
+import Categories from "./pages/Categories";
+import CategoryDetail from "./pages/CategoryDetail";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import Orders from "./pages/Orders";
+import OrderDetail from "./pages/OrderDetail";
+import ScrollToTop from "./components/ScrollToTop.jsx";
 
 // Layout wrapper for storefront
 const StorefrontLayout = () => {
@@ -40,12 +45,16 @@ const StorefrontLayout = () => {
       <Navbar />
       <main className="flex-grow">
         <Routes>
+          <ScrollToTop />
           <Route path="/" element={<Home />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/products/:slug" element={<ProductDetail />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />}>
-            <Route index element={<Navigate to="/checkout/address" replace />} />
+            <Route
+              index
+              element={<Navigate to="/checkout/address" replace />}
+            />
             <Route path="address" element={<CheckoutAddress />} />
             <Route path="payment" element={<CheckoutPayment />} />
             <Route path="confirm" element={<CheckoutConfirm />} />
@@ -79,8 +88,6 @@ function App() {
       <CartProvider>
         <Router>
           <Routes>
-
-
             {/* Storefront Layout */}
             <Route path="/*" element={<StorefrontLayout />} />
           </Routes>
