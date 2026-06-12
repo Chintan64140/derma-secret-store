@@ -61,12 +61,20 @@ const Navbar = () => {
     }
   };
 
+  const showBanner = 
+    location.pathname === '/' || 
+    location.pathname === '/shop' || 
+    location.pathname.startsWith('/category/') || 
+    location.pathname === '/categories';
+
   return (
     <>
-      {/* Top Banner */}
-      <div className="bg-brand-blue-dark text-white text-center py-2 text-xs font-semibold tracking-wider font-heading uppercase">
-        ⚡ Order above ₹449 & Get Free Shipping + 15% OFF ⚡
-      </div>
+      {/* Top Banner should show only in home page , product list page , categiry page */}
+      {showBanner && (
+        <div className="bg-brand-blue-dark text-white text-center py-2 text-xs font-semibold tracking-wider font-heading uppercase">
+          ⚡ Order above ₹449 & Get Free Shipping + 15% OFF ⚡
+        </div>
+      )}
 
       {/* Main Navbar */}
       <header className={`sticky top-0 z-40 transition-all duration-300 ${
