@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Star, ShoppingBag, ArrowLeft, RefreshCw, MessageSquare, Award, CheckCircle, Tag, ChevronLeft, ChevronRight, Maximize2, X } from 'lucide-react';
+import { Star, ShoppingBag, ArrowLeft, RefreshCw, MessageSquare, Award, CheckCircle, Tag, ChevronLeft, ChevronRight, Maximize2, X, Sparkles, ShieldCheck } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { API } from '../context/AuthContext';
 import ProductCard from '../components/ProductCard';
@@ -24,6 +24,7 @@ const ProductDetail = () => {
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [touchStartX, setTouchStartX] = useState(0);
   const [touchEndX, setTouchEndX] = useState(0);
+  const [openFaqIndex, setOpenFaqIndex] = useState(null);
   
   // Coupon States
   const [activeCoupons, setActiveCoupons] = useState([]);
@@ -164,6 +165,17 @@ const ProductDetail = () => {
   // Parse details safety check
   const details = product.details || {};
 
+  const parsedHighlights = Array.isArray(details.highlights) ? details.highlights : [];
+
+  const getBenefitIcon = (idx) => {
+    const icons = [
+      <Sparkles className="text-brand-blue shrink-0" size={22} />,
+      <ShieldCheck className="text-brand-blue shrink-0" size={22} />,
+      <Award className="text-brand-blue shrink-0" size={22} />
+    ];
+    return icons[idx % icons.length];
+  };
+
   // Unique list of product gallery images to prevent duplicates
   const galleryImages = [
     product.image_url,
@@ -204,6 +216,17 @@ const ProductDetail = () => {
     }
     setTouchStartX(0);
     setTouchEndX(0);
+  };
+
+  const handleTabClick = (e, tabId) => {
+    setActiveTab(tabId);
+    if (e.currentTarget) {
+      e.currentTarget.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center'
+      });
+    }
   };
 
   // Extract SEO elements
@@ -403,10 +426,12 @@ const ProductDetail = () => {
               <span>Dermatologically Tested & Non-Comedogenic</span>
             </div>
 
-            <div className="flex items-center gap-2">
-              <CheckCircle size={15} className="text-brand-blue" />
-              <span>Net Weight / Volume: <span className="text-brand-blue font-bold">{product.weight || '50g'}</span></span>
-            </div>
+            {product.weight && (
+              <div className="flex items-center gap-2">
+                <CheckCircle size={15} className="text-brand-blue" />
+                <span>Net Weight / Volume: <span className="text-brand-blue font-bold">{product.weight}</span></span>
+              </div>
+            )}
           </div>
 
           {/* Brief Overview */}
@@ -443,23 +468,113 @@ const ProductDetail = () => {
         </div>
       </section>
 
-      {/* 2. Clinical Specification Tabs (Desc, Use, Ingredients, FAQ) */}
+      {/* Key Benefits Section: Why You'll Love This */}
+      {parsedHighlights.length > 0 && (
+        <section className="space-y-8 animate-fade-in border border-brand-border dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 p-6 sm:p-10 shadow-xs">
+          <div className="text-center max-w-xl mx-auto space-y-2">
+            <h2 className="text-xl sm:text-2xl font-black text-brand-dark dark:text-white uppercase tracking-tight font-heading">
+              Why You'll Love This
+            </h2>
+            <div className="w-12 h-[3px] bg-brand-blue mx-auto rounded-full"></div>
+            <p className="text-xs sm:text-sm text-brand-grey dark:text-gray-400 font-medium">
+              Formulated with clinically-proven actives to target your skin concerns effectively:
+            </p>
+          </div>
+
+          <div className={`grid grid-cols-1 gap-6 pt-2 max-w-5xl mx-auto ${
+            parsedHighlights.length === 1 ? 'md:grid-cols-1 max-w-md' :
+            parsedHighlights.length === 2 ? 'md:grid-cols-2 max-w-3xl' :
+            'md:grid-cols-3'
+          }`}>
+            {parsedHighlights.map((hl, idx) => (
+              <div 
+                key={idx}
+                className="bg-[#f9fafb] dark:bg-zinc-900/40 p-5 rounded-xl border border-brand-border dark:border-zinc-800 flex items-start gap-4 hover:border-brand-blue/30 hover:scale-[1.01] hover:shadow-md transition-all duration-300"
+              >
+                {/* Icon Circle */}
+                <div className="w-12 h-12 rounded-xl bg-brand-blue-light/20 dark:bg-brand-blue/10 flex items-center justify-center shrink-0 border border-brand-blue/10 shadow-inner">
+                  {getBenefitIcon(idx)}
+                </div>
+
+                {/* Text */}
+                <div className="space-y-1">
+                  <h4 className="font-heading font-black text-xs sm:text-sm text-brand-dark dark:text-white uppercase tracking-wider leading-snug">
+                    {hl.title}
+                  </h4>
+                  <p className="text-xs text-brand-grey dark:text-zinc-400 font-medium leading-relaxed">
+                    {hl.desc}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Combo Contents Section: What does it contain? */}
+      {Array.isArray(details.combo_items) && details.combo_items.length > 0 && (
+        <section className="space-y-6 animate-fade-in border border-brand-border dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 p-6 sm:p-10 shadow-xs">
+          <div className="text-center max-w-xl mx-auto space-y-2">
+            <h2 className="text-xl sm:text-2xl font-black text-brand-dark dark:text-white uppercase tracking-tight font-heading">
+              What does it contain?
+            </h2>
+            <div className="w-12 h-[3px] bg-brand-blue mx-auto rounded-full"></div>
+            <p className="text-xs sm:text-sm text-brand-grey dark:text-gray-400 font-medium">
+              This combo pack is scientifically curated with premium individual formulations:
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 max-w-4xl mx-auto justify-center">
+            {details.combo_items.map((item, idx) => (
+              <div 
+                key={idx}
+                className="bg-brand-bg-grey dark:bg-zinc-900/45 p-4 rounded-xl border border-brand-border dark:border-zinc-800 flex items-center gap-4 hover:border-brand-blue/40 hover:scale-[1.01] hover:shadow-md transition-all duration-300 group"
+              >
+                {/* Product Image */}
+                <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white dark:bg-zinc-950 rounded-lg border border-brand-border dark:border-zinc-800 p-2 flex items-center justify-center shrink-0 overflow-hidden group-hover:scale-105 transition-transform duration-300">
+                  <img 
+                    src={getImageUrl(item.image_url)} 
+                    alt={item.name} 
+                    className="max-h-full max-w-full object-contain rounded"
+                    onError={(e) => { e.target.src = '/assets/products/placeholder.png'; }}
+                  />
+                </div>
+
+                {/* Product Text */}
+                <div className="space-y-1">
+                  <span className="bg-brand-blue/10 dark:bg-brand-blue/20 text-brand-blue dark:text-brand-blue-light text-[9px] font-extrabold px-2 py-0.5 rounded uppercase tracking-wider">
+                    Included
+                  </span>
+                  <h4 className="font-heading font-black text-xs sm:text-sm text-brand-dark dark:text-white uppercase tracking-wider leading-snug pt-0.5">
+                    {item.name}
+                  </h4>
+                  <p className="text-[11px] text-brand-grey dark:text-zinc-400 font-bold">
+                    Qty/Size: <span className="text-brand-blue dark:text-brand-blue-light">{item.qty}</span>
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* 2. Clinical Specification Tabs */}
       <section className="border border-brand-border dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 overflow-hidden shadow-xs">
         {/* Tab Headers */}
-        <div className="flex border-b border-brand-border dark:border-zinc-800 bg-brand-bg-grey dark:bg-zinc-850 overflow-x-auto">
+        <div className="flex border-b border-brand-border dark:border-zinc-800 bg-[#f9fafb] dark:bg-zinc-900 overflow-x-auto scrollbar-none">
           {[
-            { id: 'desc', label: 'Description' },
-            { id: 'use', label: 'How To Use' },
-            { id: 'ingredients', label: 'Ingredients' },
-            { id: 'faq', label: 'Clinical FAQ' }
+            { id: 'desc', label: 'Product Details' },
+            { id: 'ingredients', label: 'Ingredient' },
+            { id: 'use', label: 'How to use' },
+            { id: 'faq', label: 'FAQ' }
           ].map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-6 py-4 text-xs sm:text-sm font-bold uppercase tracking-wider font-heading transition-all border-b-2 border-transparent select-none whitespace-nowrap ${
+              onClick={(e) => handleTabClick(e, tab.id)}
+              className={`flex-1 min-w-[125px] py-4 text-center text-xs font-heading font-extrabold uppercase tracking-wider transition-all select-none border-r border-b-[3px] border-r-brand-border dark:border-r-zinc-800 last:border-r-0 ${
                 activeTab === tab.id 
-                  ? 'border-brand-blue text-brand-blue bg-white dark:bg-zinc-900' 
-                  : 'text-brand-grey dark:text-gray-400 hover:text-brand-dark dark:hover:text-white hover:bg-brand-blue-light/30 dark:hover:bg-zinc-800'
+                  ? 'text-brand-blue-dark dark:text-brand-blue-light bg-white dark:bg-zinc-800 border-b-brand-blue-dark dark:border-b-brand-blue font-black' 
+                  : 'text-zinc-400 dark:text-zinc-500 bg-[#f9fafb] dark:bg-zinc-900/60 border-b-transparent hover:text-zinc-650 dark:hover:text-zinc-350 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50'
               }`}
             >
               {tab.label}
@@ -468,44 +583,229 @@ const ProductDetail = () => {
         </div>
 
         {/* Tab Contents */}
-        <div className="p-6 sm:p-8 text-xs sm:text-sm text-brand-grey dark:text-gray-350 leading-relaxed font-medium">
+        <div className="p-6 sm:p-10 text-xs sm:text-sm text-brand-grey dark:text-gray-350 leading-relaxed font-medium">
           {activeTab === 'desc' && (
-            <div className="space-y-4">
-              <h4 className="font-bold text-brand-dark dark:text-white uppercase text-xs tracking-wider font-heading">Product Overview</h4>
-              <p>{details.description || product.description}</p>
-            </div>
-          )}
-          {activeTab === 'use' && (
-            <div className="space-y-4">
-              <h4 className="font-bold text-brand-dark dark:text-white uppercase text-xs tracking-wider font-heading">Directions for Application</h4>
-              <p className="whitespace-pre-line">{details.how_to_use || 'Cleanse skin thoroughly. Apply a thin layer to the affected area or as directed by a dermatologist.'}</p>
-            </div>
-          )}
-          {activeTab === 'ingredients' && (
-            <div className="space-y-4">
-              <h4 className="font-bold text-brand-dark dark:text-white uppercase text-xs tracking-wider font-heading">Active & Inactive Components</h4>
-              <p className="font-mono bg-brand-bg-grey dark:bg-zinc-850 p-4 rounded-lg border border-brand-border/60 dark:border-zinc-800">
-                {details.ingredients || 'Aqua, Glycerin, Propylene Glycol, Caprylic/Capric Triglyceride, Phenoxyethanol, Ethylhexylglycerin.'}
-              </p>
-            </div>
-          )}
-          {activeTab === 'faq' && (
             <div className="space-y-6">
-              <h4 className="font-bold text-brand-dark dark:text-white uppercase text-xs tracking-wider font-heading">Frequently Asked Questions</h4>
-              {details.faqs && details.faqs.length > 0 ? (
-                <div className="space-y-4">
-                  {details.faqs.map((faq, idx) => (
-                    <div key={idx} className="border-b border-brand-border/45 dark:border-zinc-800/80 pb-3 last:border-b-0">
-                      <p className="font-bold text-brand-dark dark:text-gray-200 text-xs sm:text-sm font-heading">Q: {faq.question}</p>
-                      <p className="mt-1 text-gray-500 dark:text-gray-400">A: {faq.answer}</p>
-                    </div>
-                  ))}
+              <div className="space-y-2.5">
+                <h4 className="font-heading font-black text-xs sm:text-sm uppercase tracking-wider text-brand-dark dark:text-white mb-2">
+                  PRODUCT DETAILS
+                </h4>
+                <div 
+                  className="text-xs sm:text-sm text-zinc-650 dark:text-zinc-350 leading-relaxed font-medium prose dark:prose-invert max-w-none"
+                  dangerouslySetInnerHTML={{ __html: details.description || product.description }}
+                />
+              </div>
+
+              {/* Product Guarantees Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-brand-border/60 dark:border-zinc-850">
+                <div className="p-4 bg-[#f9fafb] dark:bg-zinc-900 rounded-lg border border-brand-border dark:border-zinc-800 flex items-start gap-3 transition-transform hover:scale-[1.02]">
+                  <Award className="text-brand-blue shrink-0 mt-0.5" size={16} />
+                  <div>
+                    <h5 className="font-bold text-brand-dark dark:text-white text-xs uppercase tracking-wide mb-1">Dermatologist Formulated</h5>
+                    <p className="text-[10px] sm:text-[11px] text-brand-grey dark:text-zinc-400 font-medium">Developed by clinical skincare professionals for maximum efficacy.</p>
+                  </div>
                 </div>
-              ) : (
-                <p>No questions submitted yet. Ask us anything relative to this formulation.</p>
-              )}
+                <div className="p-4 bg-[#f9fafb] dark:bg-zinc-900 rounded-lg border border-brand-border dark:border-zinc-800 flex items-start gap-3 transition-transform hover:scale-[1.02]">
+                  <CheckCircle className="text-brand-blue shrink-0 mt-0.5" size={16} />
+                  <div>
+                    <h5 className="font-bold text-brand-dark dark:text-white text-xs uppercase tracking-wide mb-1">Clean Science</h5>
+                    <p className="text-[10px] sm:text-[11px] text-brand-grey dark:text-zinc-400 font-medium">Free from parabens, mineral oils, and harmful synthetic toxins.</p>
+                  </div>
+                </div>
+                <div className="p-4 bg-[#f9fafb] dark:bg-zinc-900 rounded-lg border border-brand-border dark:border-zinc-800 flex items-start gap-3 transition-transform hover:scale-[1.02]">
+                  <RefreshCw className="text-brand-blue shrink-0 mt-0.5" size={16} />
+                  <div>
+                    <h5 className="font-bold text-brand-dark dark:text-white text-xs uppercase tracking-wide mb-1">Targeted Treatment</h5>
+                    <p className="text-[10px] sm:text-[11px] text-brand-grey dark:text-zinc-400 font-medium">Optimized pH levels and concentration to target specific concerns.</p>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
+
+          {activeTab === 'use' && (() => {
+            const directions = details.how_to_use;
+            const suitableItems = Array.isArray(details.suitable_for) ? details.suitable_for : [];
+
+            if (!directions && suitableItems.length === 0) {
+              return (
+                <div className="text-center py-6">
+                  <p className="text-xs sm:text-sm text-brand-grey dark:text-zinc-400 font-medium">No directions or suitability guidelines available for this formulation.</p>
+                </div>
+              );
+            }
+
+            return (
+              <div className="space-y-6">
+                {directions && (
+                  <div>
+                    <h4 className="font-heading font-black text-xs sm:text-sm uppercase tracking-wider text-brand-dark dark:text-white mb-4">
+                      DIRECTIONS FOR APPLICATION
+                    </h4>
+                    {Array.isArray(directions) ? (
+                      <div className="flex flex-col gap-4 max-w-2xl">
+                        {directions.map((step, idx) => (
+                          <div key={idx} className="flex gap-4 items-start p-4 bg-[#f9fafb] dark:bg-zinc-900/60 border border-brand-border dark:border-zinc-800 rounded-xl hover:border-brand-blue/30 transition-all duration-300">
+                            <span className="flex items-center justify-center w-7 h-7 rounded-full bg-brand-blue/10 dark:bg-brand-blue/25 text-brand-blue dark:text-brand-blue-light font-black text-xs shrink-0">
+                              {step.no || (idx + 1)}
+                            </span>
+                            <div className="space-y-1">
+                              <h5 className="font-heading font-black text-xs sm:text-sm text-brand-dark dark:text-white uppercase tracking-wider">
+                                {step.title}
+                              </h5>
+                              <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium">
+                                {step.details}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-xs sm:text-sm text-zinc-650 dark:text-zinc-350 leading-relaxed font-medium">
+                        {directions}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {suitableItems.length > 0 && (
+                  <div>
+                    <h5 className="font-bold text-brand-dark dark:text-white text-xs sm:text-sm mb-3 uppercase tracking-wide">
+                      Suitable For:
+                    </h5>
+                    <ul className="space-y-2 text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 font-medium pl-1">
+                      {suitableItems.map((item, idx) => (
+                        <li key={idx} className="flex items-center gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-brand-blue shrink-0"></span>
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
+          {activeTab === 'ingredients' && (() => {
+            const keyActivesList = Array.isArray(details.key_actives) ? details.key_actives : [];
+            const rawIngredients = details.ingredients;
+            const ingredientsArray = Array.isArray(rawIngredients)
+              ? rawIngredients
+              : (rawIngredients ? rawIngredients.split(/[;,]/).map(item => item.trim()).filter(Boolean) : []);
+
+            if (keyActivesList.length === 0 && ingredientsArray.length === 0) {
+              return (
+                <div className="text-center py-6">
+                  <p className="text-xs sm:text-sm text-brand-grey dark:text-zinc-400 font-medium">No ingredients or key actives defined for this formulation.</p>
+                </div>
+              );
+            }
+
+            return (
+              <div className="space-y-8 animate-fade-in">
+                {/* Visual Key Actives List */}
+                {keyActivesList.length > 0 && (
+                  <div className="space-y-6">
+                    {keyActivesList.map((active, idx) => (
+                      <div key={idx} className="flex items-start gap-4">
+                        {/* Powder Pile Icon Box */}
+                        <div className="w-12 h-12 rounded-full bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center shrink-0 border border-zinc-200/60 dark:border-zinc-700 shadow-inner">
+                          <svg viewBox="0 0 100 100" className="w-8 h-8 opacity-80" fill="currentColor">
+                            <path d="M50 22 C64 52, 78 72, 78 77 C78 82, 22 82, 22 77 C22 72, 36 52, 50 22 Z" className="text-zinc-300 dark:text-zinc-600" />
+                            <path d="M50 35 C58 55, 68 68, 68 72 C68 76, 32 76, 32 72 C32 68, 42 55, 50 35 Z" className="text-zinc-400 dark:text-zinc-500" />
+                          </svg>
+                        </div>
+                        
+                        {/* Details */}
+                        <div className="space-y-1">
+                          <div className="relative pb-1 inline-block">
+                            <h5 className="font-heading font-black text-sm sm:text-base text-brand-dark dark:text-white uppercase tracking-wider">
+                              {active.name}
+                            </h5>
+                            {/* Short green/teal underline under first few letters */}
+                            <div className="absolute bottom-0 left-0 w-8 h-[2.5px] bg-brand-blue rounded-full"></div>
+                          </div>
+                          <p className="text-xs sm:text-sm text-brand-grey dark:text-zinc-400 font-medium">
+                            {active.benefit}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Full Ingredients List Divider / Numbered List */}
+                {ingredientsArray.length > 0 && (
+                  <div className="  border-brand-border/60 dark:border-zinc-850 space-y-4">
+                    <h6 className="font-bold text-[10px] text-brand-grey dark:text-zinc-550 uppercase tracking-widest font-heading">
+                      Ingredients List:
+                    </h6>
+                    <div className=" rounded-lg  max-w-xl">
+                      <div className="flex flex-col gap-2.5">
+                        {ingredientsArray.map((ing, idx) => (
+                          <div 
+                            key={idx} 
+                            className="flex items-center gap-3 text-xs sm:text-sm text-brand-dark dark:text-zinc-200 font-semibold bg-white dark:bg-zinc-900 px-4 py-2.5 rounded-lg border border-brand-border dark:border-zinc-800 shadow-2xs transition-all hover:border-brand-blue hover:translate-x-0.5 duration-200"
+                          >
+                            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-brand-blue/10 dark:bg-brand-blue/20 text-brand-blue dark:text-brand-blue-light font-black text-xs shrink-0">
+                              {idx + 1}
+                            </span>
+                            <span>{ing}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
+          {activeTab === 'faq' && (() => {
+            const faqs = details.faqs || [];
+            
+            if (faqs.length === 0) {
+              return (
+                <div className="text-center py-6">
+                  <p className="text-xs sm:text-sm text-brand-grey dark:text-zinc-400 font-medium">No clinical FAQs available for this formulation. Ask us anything.</p>
+                </div>
+              );
+            }
+
+            return (
+              <div className="space-y-5">
+                <h4 className="font-heading font-black text-xs sm:text-sm uppercase tracking-wider text-brand-dark dark:text-white mb-2">
+                  FREQUENTLY ASKED CLINICAL QUESTIONS
+                </h4>
+                <div className="divide-y divide-brand-border dark:divide-zinc-800 border border-brand-border dark:border-zinc-800 rounded-xl overflow-hidden bg-[#f9fafb]/40 dark:bg-zinc-955/20">
+                  {faqs.map((faq, idx) => {
+                    const isOpen = openFaqIndex === idx;
+                    return (
+                      <div key={idx} className="transition-all duration-300">
+                        <button 
+                          onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
+                          className="w-full px-5 py-4 text-left font-bold text-brand-dark dark:text-white text-xs sm:text-sm font-heading flex items-center justify-between gap-4 hover:bg-brand-blue-light/10 dark:hover:bg-zinc-900 transition-colors focus:outline-none"
+                        >
+                          <span className="uppercase tracking-wide">Q: {faq.question}</span>
+                          <span className={`text-brand-blue font-bold text-lg transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
+                            {isOpen ? '−' : '+'}
+                          </span>
+                        </button>
+                        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                          isOpen ? 'max-h-96 border-t border-brand-border/40 dark:border-zinc-800/40 opacity-100' : 'max-h-0 opacity-0'
+                        }`}>
+                          <p className="px-5 py-4 text-xs sm:text-sm text-brand-grey dark:text-zinc-400 leading-relaxed font-medium bg-white dark:bg-zinc-900">
+                            <strong>A:</strong> {faq.answer}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
         </div>
       </section>
 
