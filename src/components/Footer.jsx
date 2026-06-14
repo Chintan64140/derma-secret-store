@@ -1,8 +1,47 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Phone, Mail, MapPin, ShieldCheck, HeartPulse } from 'lucide-react';
+import { API } from '../context/AuthContext';
+
+const defaultCategories = [
+  { id: 1, name: 'Sun Protection', slug: 'sun-protection' },
+  { id: 2, name: 'Acne & Acne Scars', slug: 'acne-care' },
+  { id: 3, name: 'Face Care', slug: 'face-care' },
+  { id: 4, name: 'Body Care', slug: 'body-care' },
+  { id: 5, name: 'Hair & Scalp Care', slug: 'hair-care' },
+  { id: 6, name: 'Mommy & Baby', slug: 'mommy-care' }
+];
+
+const defaultConcerns = [
+  { id: 1, name: 'Acne Breakouts', slug: 'acne-breakouts' },
+  { id: 2, name: 'Pigmentation & Dark Spots', slug: 'hyperpigmentation' },
+  { id: 3, name: 'Tan & Sun Damage', slug: 'sun-damage' },
+  { id: 4, name: 'Dry, Damaged Skin', slug: 'dryness-dehydration' },
+  { id: 5, name: 'Wrinkles & Fine Lines', slug: 'anti-aging' },
+  { id: 6, name: 'Hair Thinning & Dandruff', slug: 'hair-fall' }
+];
 
 const Footer = () => {
+  const [categories, setCategories] = useState(defaultCategories);
+  const [concerns, setConcerns] = useState(defaultConcerns);
+
+  useEffect(() => {
+    API.get('/products/categories')
+      .then(res => {
+        if (res.data && Array.isArray(res.data) && res.data.length > 0) {
+          setCategories(res.data);
+        }
+      })
+      .catch(err => console.error('Footer categories load failed:', err.message));
+
+    API.get('/products/concerns')
+      .then(res => {
+        if (res.data && Array.isArray(res.data) && res.data.length > 0) {
+          setConcerns(res.data);
+        }
+      })
+      .catch(err => console.error('Footer concerns load failed:', err.message));
+  }, []);
   return (
     <footer className="bg-brand-blue-dark dark:bg-zinc-950 text-white border-t border-brand-border dark:border-zinc-900 transition-colors duration-300">
       {/* Upper Feature Highlights */}
@@ -75,12 +114,13 @@ const Footer = () => {
           <div>
             <h3 className="font-bold text-sm font-heading text-brand-yellow uppercase tracking-wider mb-4">Shop Categories</h3>
             <ul className="space-y-2 text-xs text-gray-300 font-medium">
-              <li><Link to="/category/sun-protection" className="hover:text-brand-yellow transition-colors">Sun Protection</Link></li>
-              <li><Link to="/category/acne-care" className="hover:text-brand-yellow transition-colors">Acne & Acne Scars</Link></li>
-              <li><Link to="/category/face-care" className="hover:text-brand-yellow transition-colors">Face Care</Link></li>
-              <li><Link to="/category/body-care" className="hover:text-brand-yellow transition-colors">Body Care</Link></li>
-              <li><Link to="/category/hair-care" className="hover:text-brand-yellow transition-colors">Hair & Scalp Care</Link></li>
-              <li><Link to="/category/mommy-care" className="hover:text-brand-yellow transition-colors">Mommy & Baby</Link></li>
+              {categories.slice(0, 6).map((cat) => (
+                <li key={cat.id}>
+                  <Link to={`/category/${cat.slug}`} className="hover:text-brand-yellow transition-colors">
+                    {cat.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -88,12 +128,13 @@ const Footer = () => {
           <div>
             <h3 className="font-bold text-sm font-heading text-brand-yellow uppercase tracking-wider mb-4">Shop By Concern</h3>
             <ul className="space-y-2 text-xs text-gray-300 font-medium">
-              <li><Link to="/shop?concern=acne" className="hover:text-brand-yellow transition-colors">Acne Breakuots</Link></li>
-              <li><Link to="/shop?concern=hyperpigmentation" className="hover:text-brand-yellow transition-colors">Pigmentation & Dark Spots</Link></li>
-              <li><Link to="/shop?concern=sun-damage" className="hover:text-brand-yellow transition-colors">Tan & Sun Damage</Link></li>
-              <li><Link to="/shop?concern=dryness" className="hover:text-brand-yellow transition-colors">Dry, Damaged Skin</Link></li>
-              <li><Link to="/shop?concern=anti-aging" className="hover:text-brand-yellow transition-colors">Wrinkles & Fine Lines</Link></li>
-              <li><Link to="/shop?concern=hair-fall" className="hover:text-brand-yellow transition-colors">Hair Thinning & Dandruff</Link></li>
+              {concerns.slice(0, 6).map((con) => (
+                <li key={con.id}>
+                  <Link to={`/shop?concern=${con.slug}`} className="hover:text-brand-yellow transition-colors">
+                    {con.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 

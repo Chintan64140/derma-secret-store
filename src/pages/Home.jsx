@@ -121,18 +121,6 @@ const Home = () => {
     { title: "Clinically Proven", desc: "Tested & proven active ingredients." },
   ]);
 
-  const [consultationBanner, setConsultationBanner] = useState({
-    banner_image: "/assets/banners/sunscreen_banner.jpg",
-    small_title: "Free Dermatologist Consultation",
-    icon: "Sparkles",
-    heading: "Confused about what your skin needs?",
-    description:
-      "Interact with our skin consultation questionnaire or consult directly with certified medical experts online to get a custom prescription tailored to your exact skin type.",
-    button1_label: "Analyze My Skin",
-    button1_link: "/shop",
-    button2_label: "Call: 1800-102-345",
-    button2_link: "tel:1800102345",
-  });
 
   const [ngoBanner, setNgoBanner] = useState({
     banner_image: "/assets/banners/about_ngo_banner.jpg",
@@ -258,9 +246,12 @@ const Home = () => {
                   >
                     <div className="relative w-28 h-28 sm:w-40 sm:h-40 rounded-full overflow-hidden shadow-sm transition-transform duration-300 transform group-hover:scale-105">
                       <img
-                        src={getConcernImage(concern.slug)}
+                        src={getImageUrl(concern.image_url)}
                         alt={concern.name}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.src = getConcernImage(concern.slug);
+                        }}
                       />
                       {/* Subtle hover overlay */}
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-all duration-300"></div>

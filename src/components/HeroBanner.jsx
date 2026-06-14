@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { API } from '../context/AuthContext';
+import { getImageUrl } from '../utils/image';
 
 const defaultBanners = [
   {
@@ -28,7 +30,24 @@ const defaultBanners = [
 const HeroBanner = () => {
   const [banners, setBanners] = useState(defaultBanners);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchBanners = async () => {
+      try {
+        const res = await API.get('/products/cms/hero');
+        if (res.data && Array.isArray(res.data) && res.data.length > 0) {
+          setBanners(res.data);
+        }
+      } catch (err) {
+        console.error('Failed to load hero banners from CMS:', err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBanners();
+  }, []);
 
   const prevSlide = () => {
     setCurrentIndex((prev) => (prev === 0 ? banners.length - 1 : prev - 1));
@@ -57,10 +76,13 @@ const HeroBanner = () => {
             <div key={banner.id || index} className="w-full h-full flex-shrink-0 relative">
               {/* Background Image with Dark Gradient Overlay */}
               {/* <div className="absolute inset-0 bg-gradient-to-r from-brand-blue-dark/85 via-brand-blue-dark/50 to-transparent z-10"></div> */}
-              <picture className="w-full h-full block">
-                <source media="(max-width: 639px)" srcSet={banner.mobileImage || banner.image} />
+              <picture 
+                className={`w-full h-full block ${banner.link ? 'cursor-pointer' : ''}`}
+                onClick={() => banner.link && navigate(banner.link)}
+              >
+                <source media="(max-width: 639px)" srcSet={getImageUrl(banner.mobileImage || banner.image)} />
                 <img 
-                  src={banner.image} 
+                  src={getImageUrl(banner.image)} 
                   alt={banner.title} 
                   className="w-full h-full object-fill object-center animate-fade-in"
                 />
