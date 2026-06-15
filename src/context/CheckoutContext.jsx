@@ -193,43 +193,72 @@ export const CheckoutProvider = ({ children }) => {
     // 2. Razorpay Flow
     if (paymentMethod === 'RAZORPAY') {
       try {
-        // Create Razorpay Order on backend
-        const res = await API.post('/orders/razorpay/create', {
-          cartItems,
-          discountAmount: couponDiscountAmount
+        const netPayableTotal = Math.max(0, cartTotal - couponDiscountAmount);
+        const finalTotal = netPayableTotal + (netPayableTotal >= 449 ? 0 : 50);
+        const amountInPaise = Math.round(finalTotal * 100);
+
+        // Create Razorpay Order on backend using the new generic endpoint
+        const res = await API.post('/create-order', {
+          amount: amountInPaise,
+          currency: 'INR',
+          receipt: `receipt_order_${Math.random().toString(36).substring(2, 10)}`
         });
 
         const orderData = res.data;
-        setRazorpayOrderDetails(orderData);
+        const localKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
+        const simulated = !localKey || localKey.includes('your-') || localKey === '';
 
-        if (orderData.simulated) {
+        setRazorpayOrderDetails({
+          id: orderData.order_id,
+          amount: orderData.amount,
+          currency: orderData.currency,
+          simulated: simulated
+        });
+
+        if (simulated) {
           // Open simulated modal
           setIsRazorpayModalOpen(true);
           setSubmitting(false);
         } else {
-          // Load Razorpay script and open real modal
-          const loaded = await loadRazorpayScript();
-          if (!loaded) {
-            setErrorMsg('Failed to load Razorpay Checkout. Please check your network connection.');
+          if (!window.Razorpay) {
+            setErrorMsg('Razorpay SDK failed to load. Please check your network connection.');
             setSubmitting(false);
             return;
           }
 
           const options = {
-            key: orderData.key,
+            key: localKey,
             amount: orderData.amount,
             currency: orderData.currency || 'INR',
             name: 'Derma Secret Store',
             description: 'Clinical Skincare Order Payment',
-            order_id: orderData.id,
+            order_id: orderData.order_id,
             handler: async function (response) {
-              const verificationData = {
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_signature: response.razorpay_signature,
-                simulated: false
-              };
-              await finalizeOrder(verificationData);
+              try {
+                // Verify signature on backend using verify-payment endpoint
+                const verifyRes = await API.post('/verify-payment', {
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature
+                });
+
+                if (verifyRes.data.success) {
+                  const verificationData = {
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_order_id: response.razorpay_order_id,
+                    razorpay_signature: response.razorpay_signature,
+                    simulated: false
+                  };
+                  await finalizeOrder(verificationData);
+                } else {
+                  setErrorMsg('Payment verification failed.');
+                  setSubmitting(false);
+                }
+              } catch (verifyErr) {
+                console.error('Signature verification failed:', verifyErr);
+                setErrorMsg(verifyErr.response?.data?.message || 'Payment verification failed.');
+                setSubmitting(false);
+              }
             },
             prefill: {
               name,
@@ -252,9 +281,9 @@ export const CheckoutProvider = ({ children }) => {
             setSubmitting(false);
           });
           rzp.open();
-          setSubmitting(false);
         }
       } catch (err) {
+        console.error('Razorpay payment initiation error:', err);
         setErrorMsg(err.response?.data?.message || 'Failed to initiate Razorpay online payment.');
         setSubmitting(false);
       }
