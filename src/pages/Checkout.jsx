@@ -2,12 +2,14 @@ import React from 'react';
 import { Outlet, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import { CheckCircle2, AlertCircle, Truck } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import { CheckoutProvider, useCheckout } from '../context/CheckoutContext';
 import SEO from '../components/SEO';
 import RazorpayModal from '../components/RazorpayModal';
 
 const CheckoutLayout = () => {
   const { cartItems, cartTotal } = useCart();
+  const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const isSuccessPage = location.pathname.endsWith('/success');
@@ -30,6 +32,11 @@ const CheckoutLayout = () => {
     finalizeOrder,
     shippingSettings
   } = useCheckout();
+
+  // Redirect to login if not logged in
+  if (!user && !isSuccessPage) {
+    return <Navigate to="/login?redirect=checkout" replace />;
+  }
 
   // Redirect logic for empty cart (except on success page)
   if (cartItems.length === 0 && !isSuccessPage) {

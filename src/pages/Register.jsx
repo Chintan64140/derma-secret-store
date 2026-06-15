@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { UserPlus, Mail, Lock, User, AlertCircle, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import SEO from '../components/SEO';
@@ -7,6 +7,7 @@ import SEO from '../components/SEO';
 const Register = () => {
   const { register, user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Form States
   const [name, setName] = useState('');
@@ -21,9 +22,10 @@ const Register = () => {
   // Redirect if already logged in
   useEffect(() => {
     if (user) {
-      navigate('/profile');
+      const redirect = new URLSearchParams(location.search).get('redirect') || 'profile';
+      navigate(redirect.startsWith('/') ? redirect : `/${redirect}`);
     }
-  }, [user, navigate]);
+  }, [user, navigate, location.search]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

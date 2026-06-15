@@ -21,9 +21,10 @@ const Login = () => {
   // Redirect if already logged in
   useEffect(() => {
     if (user) {
-      navigate('/profile');
+      const redirect = new URLSearchParams(location.search).get('redirect') || 'profile';
+      navigate(redirect.startsWith('/') ? redirect : `/${redirect}`);
     }
-  }, [user, navigate]);
+  }, [user, navigate, location.search]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
