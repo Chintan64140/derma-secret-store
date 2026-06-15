@@ -509,11 +509,15 @@ const OrderDetail = () => {
               <div className="flex justify-between text-brand-grey dark:text-gray-400">
                 <span>Clinical Shipping & Handing</span>
                 <span>
-                  {parseFloat(order.total_price) >= 449 ? (
-                    <span className="text-brand-blue dark:text-brand-blue-light uppercase font-bold">Free</span>
-                  ) : (
-                    '₹50.00'
-                  )}
+                  {(() => {
+                    const rawShipping = (parseFloat(order.net_price) || 0) - ((parseFloat(order.total_price) || 0) - (parseFloat(order.discount_amount) || 0));
+                    const shippingFeeCharged = Math.max(0, rawShipping);
+                    return shippingFeeCharged === 0 ? (
+                      <span className="text-brand-blue dark:text-brand-blue-light uppercase font-bold">Free</span>
+                    ) : (
+                      `₹${shippingFeeCharged.toFixed(2)}`
+                    );
+                  })()}
                 </span>
               </div>
 

@@ -27,7 +27,8 @@ const CheckoutLayout = () => {
     isRazorpayModalOpen,
     setIsRazorpayModalOpen,
     razorpayOrderDetails,
-    finalizeOrder
+    finalizeOrder,
+    shippingSettings
   } = useCheckout();
 
   // Redirect logic for empty cart (except on success page)
@@ -76,8 +77,10 @@ const CheckoutLayout = () => {
     }
   };
 
-  const netPayableTotal = Math.max(0, cartTotal - couponDiscountAmount);
-  const finalTotal = netPayableTotal + (netPayableTotal >= 449 ? 0 : 50);
+  const netPayableTotal = Math.max(0, cartTotal - couponDiscountAmount); 
+  const shippingFee = netPayableTotal >= shippingSettings.free_shipping_threshold ? 0 : shippingSettings.shipping_fee;
+  const finalTotal = netPayableTotal + shippingFee;
+
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
@@ -246,7 +249,7 @@ const CheckoutLayout = () => {
               <div className="flex justify-between text-brand-grey dark:text-gray-400">
                 <span>Shipping Charges</span>
                 <span className="font-semibold text-brand-blue">
-                  {netPayableTotal >= 449 ? 'FREE' : '₹50.00'}
+                  {netPayableTotal >= shippingSettings.free_shipping_threshold ? 'FREE' : `₹${shippingSettings.shipping_fee.toFixed(2)}`}
                 </span>
               </div>
               

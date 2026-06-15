@@ -33,6 +33,24 @@ export const CheckoutProvider = ({ children }) => {
   const [couponSuccess, setCouponSuccess] = useState('');
   const [couponValidating, setCouponValidating] = useState(false);
 
+  // Dynamic Shipping Settings State
+  const [shippingSettings, setShippingSettings] = useState({ shipping_fee: 50, free_shipping_threshold: 449 });
+
+  useEffect(() => {
+    API.get('/products/cms/shipping')
+      .then(res => {
+        if (res.data) {
+          setShippingSettings({
+            shipping_fee: parseFloat(res.data.shipping_fee) || 0,
+            free_shipping_threshold: parseFloat(res.data.free_shipping_threshold) || 0
+          });
+        }
+      })
+      .catch(err => {
+        console.error('Failed to load shipping settings:', err);
+      });
+  }, []);
+
   // Razorpay Integration States
   const [isRazorpayModalOpen, setIsRazorpayModalOpen] = useState(false);
   const [razorpayOrderDetails, setRazorpayOrderDetails] = useState(null);
@@ -152,8 +170,10 @@ export const CheckoutProvider = ({ children }) => {
       });
 
       setOrderSuccess(res.data);
-      clearCart();
       navigate('/checkout/success');
+      setTimeout(() => {
+        clearCart();
+      }, 50);
     } catch (err) {
       setErrorMsg(err.response?.data?.message || 'Error processing payment. Please try again.');
     } finally {
@@ -180,8 +200,10 @@ export const CheckoutProvider = ({ children }) => {
         });
 
         setOrderSuccess(res.data);
-        clearCart();
         navigate('/checkout/success');
+        setTimeout(() => {
+          clearCart();
+        }, 50);
       } catch (err) {
         setErrorMsg(err.response?.data?.message || 'Error processing checkout. Please try again.');
       } finally {
@@ -194,7 +216,8 @@ export const CheckoutProvider = ({ children }) => {
     if (paymentMethod === 'RAZORPAY') {
       try {
         const netPayableTotal = Math.max(0, cartTotal - couponDiscountAmount);
-        const finalTotal = netPayableTotal + (netPayableTotal >= 449 ? 0 : 50);
+        const shippingFee = netPayableTotal >= shippingSettings.free_shipping_threshold ? 0 : shippingSettings.shipping_fee;
+        const finalTotal = netPayableTotal + shippingFee;
         const amountInPaise = Math.round(finalTotal * 100);
 
         // Create Razorpay Order on backend using the new generic endpoint
@@ -205,8 +228,8 @@ export const CheckoutProvider = ({ children }) => {
         });
 
         const orderData = res.data;
-        const localKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
-        const simulated = !localKey || localKey.includes('your-') || localKey === '';
+        const localKey = import.meta.env.VITE_RAZORPAY_KEY_ID || orderData.key;
+        const simulated = !localKey || localKey.includes('your-') || localKey === '' || localKey === 'rzp_test_simulated' || orderData.simulated === true;
 
         setRazorpayOrderDetails({
           id: orderData.order_id,
@@ -332,7 +355,8 @@ export const CheckoutProvider = ({ children }) => {
       handlePlaceOrder,
       finalizeOrder,
       isAddressValid,
-      isPaymentValid
+      isPaymentValid,
+      shippingSettings
     }}>
       {children}
     </CheckoutContext.Provider>
