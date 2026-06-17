@@ -73,19 +73,6 @@ const Home = () => {
   const [concerns, setConcerns] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // CMS dynamic configuration states with default fallback settings
-  const [brandMarquee, setBrandMarquee] = useState({
-    headline: "Featured & Trusted In",
-    brands: [
-      "Elle Magazine",
-      "Cosmopolitan",
-      "NDTV Beauty",
-      "Times of India",
-      "Vogue India",
-      "Femina",
-    ],
-  });
-
   const [trustCards, setTrustCards] = useState([
     {
       id: 1,
@@ -120,7 +107,6 @@ const Home = () => {
     { title: "Cruelty Free", desc: "Never tested on animals." },
     { title: "Clinically Proven", desc: "Tested & proven active ingredients." },
   ]);
-
 
   const [ngoBanner, setNgoBanner] = useState({
     banner_image: "/assets/banners/about_ngo_banner.jpg",
@@ -212,19 +198,19 @@ const Home = () => {
         </ScrollReveal>
 
         {loading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 md:gap-8 justify-items-center">
+          <div className="flex flex-wrap justify-center gap-6 md:gap-8">
             {[...Array(6)].map((_, i) => (
               <div
                 key={i}
-                className="flex flex-col items-center space-y-4 animate-pulse"
+                className="flex flex-col items-center space-y-4 animate-pulse w-[130px] sm:w-[180px]"
               >
-                <div className="w-28 h-28 sm:w-40 sm:h-40 bg-gray-200 rounded-full"></div>
-                <div className="h-4 bg-gray-200 rounded w-20"></div>
+                <div className="w-28 h-28 sm:w-40 sm:h-40 bg-gray-200 rounded-full mx-auto"></div>
+                <div className="h-4 bg-gray-200 rounded w-20 mx-auto"></div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 md:gap-8 justify-items-center">
+          <div className="flex flex-wrap justify-center gap-6 md:gap-8 mx-auto">
             {concerns.map((concern, index) => {
               const delays = [
                 "",
@@ -238,7 +224,7 @@ const Home = () => {
                 <ScrollReveal
                   key={concern.id}
                   delay={delays[index % 6]}
-                  className="w-full"
+                  className="w-[130px] sm:w-[180px]"
                 >
                   <Link
                     to={`/shop?concern=${concern.slug}`}
@@ -447,19 +433,19 @@ const Home = () => {
         </ScrollReveal>
 
         {loading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 justify-items-center">
+          <div className="flex flex-wrap justify-center gap-6 md:gap-8">
             {[...Array(6)].map((_, i) => (
               <div
                 key={i}
-                className="flex flex-col items-center space-y-3 animate-pulse"
+                className="flex flex-col items-center space-y-3 animate-pulse w-[130px] sm:w-[150px]"
               >
-                <div className="w-24 h-24 sm:w-28 sm:h-28 bg-gray-200 rounded-full"></div>
-                <div className="h-4 bg-gray-200 rounded w-16"></div>
+                <div className="w-24 h-24 sm:w-28 sm:h-28 bg-gray-200 rounded-full mx-auto"></div>
+                <div className="h-4 bg-gray-200 rounded w-16 mx-auto"></div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 md:gap-8 justify-items-center">
+          <div className="flex flex-wrap justify-center gap-6 md:gap-8">
             {categories.map((category, index) => {
               const delays = [
                 "",
@@ -473,7 +459,7 @@ const Home = () => {
                 <ScrollReveal
                   key={category.id}
                   delay={delays[index % 6]}
-                  className="w-full"
+                  className="w-[130px] sm:w-[150px]"
                 >
                   <Link
                     to={`/shop?category=${category.slug}`}

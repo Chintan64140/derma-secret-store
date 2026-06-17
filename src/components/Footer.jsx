@@ -65,7 +65,7 @@ const Footer = () => {
             <Phone size={28} className="text-brand-yellow flex-shrink-0" />
             <div>
               <h4 className="font-bold text-sm font-heading">Expert Guidance</h4>
-              <p className="text-xs text-gray-300">Free tele-consultation: 1800-102-345</p>
+              <p className="text-xs text-gray-300">Free tele-consultation: +91 7990952840</p>
             </div>
           </div>
           <div className="flex items-center gap-3 justify-center sm:justify-start">
@@ -97,15 +97,15 @@ const Footer = () => {
             <div className="space-y-2 text-xs text-gray-300">
               <div className="flex items-center gap-2">
                 <Phone size={14} className="text-brand-yellow" />
-                <span>+91 1800-102-345 (Toll Free)</span>
+                <span>+91 7990952840</span>
               </div>
               <div className="flex items-center gap-2">
                 <Mail size={14} className="text-brand-yellow" />
-                <span>support@dermasecret.com</span>
+                <span>support@dermasecret.shop</span>
               </div>
               <div className="flex items-center gap-2">
                 <MapPin size={14} className="text-brand-yellow" />
-                <span>Derma Secret Laboratories Ltd., Gurugram, HR</span>
+                <span>F-3 Liberty nine , Mota Varachha , Surat - 394101</span>
               </div>
             </div>
           </div>
@@ -163,9 +163,10 @@ const Footer = () => {
           <div className="flex flex-col sm:flex-row justify-between items-center text-[11px] text-gray-400 gap-2 border-t border-white/5 pt-4">
             <p>© {new Date().getFullYear()} Derma Secret Skincare. All rights reserved. Created for demonstration purposes.</p>
             <div className="flex gap-4">
-              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-white transition-colors">Terms of Use</a>
-              <a href="#" className="hover:text-white transition-colors">Shipping & Refund Policy</a>
+              <Link to="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
+              <Link to="/terms-of-services" className="hover:text-white transition-colors">Terms of Use</Link>
+              <Link to="/shipping-policy" className="hover:text-white transition-colors">Shipping Policy</Link>
+              <Link to="/refund-policy" className="hover:text-white transition-colors">Refund Policy</Link>
             </div>
           </div>
         </div>

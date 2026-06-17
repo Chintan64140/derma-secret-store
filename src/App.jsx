@@ -37,6 +37,10 @@ import Contact from "./pages/Contact";
 import Orders from "./pages/Orders";
 import OrderDetail from "./pages/OrderDetail";
 import ScrollToTop from "./components/ScrollToTop.jsx";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import RefundPolicy from "./pages/RefundPolicy";
+import ShippingPolicy from "./pages/ShippingPolicy";
+import TermsOfServices from "./pages/TermsOfServices";
 
 // Layout wrapper for storefront
 const StorefrontLayout = () => {
@@ -72,6 +76,10 @@ const StorefrontLayout = () => {
           <Route path="/contact" element={<Contact />} />
           <Route path="/orders" element={<Orders />} />
           <Route path="/orders/:id" element={<OrderDetail />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/refund-policy" element={<RefundPolicy />} />
+          <Route path="/shipping-policy" element={<ShippingPolicy />} />
+          <Route path="/terms-of-services" element={<TermsOfServices />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

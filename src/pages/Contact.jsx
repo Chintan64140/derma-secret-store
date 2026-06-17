@@ -37,15 +37,15 @@ const Contact = () => {
   };
 
   const contactDetails = [
-    { icon: <Phone className="text-brand-blue" size={20} />, title: 'Dermatology Tele-Consult', info: '1800-102-345 (Toll Free)', desc: 'Mon - Sat: 9 AM to 6 PM IST' },
-    { icon: <Mail className="text-brand-blue" size={20} />, title: 'Support & Queries', info: 'support@dermasecret.com', desc: 'Average response: under 12 hours' },
-    { icon: <MapPin className="text-brand-blue" size={20} />, title: 'Clinical HQ Address', info: 'Derma Secret Laboratory', desc: 'Sector-44, Gurugram, HR - 122003' }
+    { icon: <Phone className="text-brand-blue" size={20} />, title: 'Dermatology Tele-Consult', info: '+91 7990952840', desc: 'Mon - Sat: 9 AM to 6 PM IST' },
+    { icon: <Mail className="text-brand-blue" size={20} />, title: 'Support & Queries', info: 'support@dermasecret.shop', desc: 'Average response: under 12 hours' },
+    { icon: <MapPin className="text-brand-blue" size={20} />, title: 'Clinical HQ Address', info: 'Derma Secret Laboratory HQ', desc: 'F-3 Liberty nine, Mota Varachha, Surat - 394101' }
   ];
 
   const faqs = [
-    { q: 'Are consultations completely free?', a: 'Yes! Our clinical dermatology consultation program is 100% free of charge. Simply fill out the skin profile form or dial our toll-free number.' },
+    { q: 'Are consultations completely free?', a: 'Yes! Our clinical dermatology consultation program is 100% free of charge. Simply fill out the skin profile form or dial our helpline number.' },
     { q: 'How long does shipping take?', a: 'Orders are dispatched within 24 hours from our laboratories. Delivery typically takes 2-4 business days across India.' },
-    { q: 'Can I cancel or modify my order?', a: 'You can cancel or change your order details within 2 hours of placement. Contact support at support@dermasecret.com or dial +91 1800-102-345.' },
+    { q: 'Can I cancel or modify my order?', a: 'You can cancel or change your order details within 2 hours of placement. Contact support at support@dermasecret.shop or dial +91 7990952840.' },
     { q: 'What is the return policy for allergic reactions?', a: 'Though our products are highly hypoallergenic, if you experience an adverse reaction, contact our support team. We offer full refund guarantees on dermatologist-certified reaction logs.' }
   ];
 
