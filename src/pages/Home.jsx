@@ -71,6 +71,7 @@ const Home = () => {
   const [bestSellers, setBestSellers] = useState([]);
   const [categories, setCategories] = useState([]);
   const [concerns, setConcerns] = useState([]);
+  const [combos, setCombos] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [trustCards, setTrustCards] = useState([
@@ -130,17 +131,19 @@ const Home = () => {
       try {
         setLoading(true);
         // Fetch static/standard store collections
-        const [latestRes, bestSellersRes, categoriesRes, concernsRes] =
+        const [latestRes, bestSellersRes, categoriesRes, concernsRes, combosRes] =
           await Promise.all([
             API.get("/products?sort=latest&limit=8"),
             API.get("/products?bestSeller=true&limit=8"),
             API.get("/products/categories"),
             API.get("/products/concerns"),
+            API.get("/products?search=combo"),
           ]);
         setLatestProducts(latestRes.data);
         setBestSellers(bestSellersRes.data);
         setCategories(categoriesRes.data);
         setConcerns(concernsRes.data);
+        setCombos(combosRes.data);
       } catch (err) {
         console.error("Home page data fetch error:", err.message);
       } finally {
@@ -364,6 +367,55 @@ const Home = () => {
               const delays = ["", "delay-100", "delay-200", "delay-300"];
               return (
                 <ScrollReveal key={product.id} delay={delays[index % 4]}>
+                  <ProductCard product={product} />
+                </ScrollReveal>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      {/* 4.2. Value Combos & Kits */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <ScrollReveal>
+          <div className="flex flex-col sm:flex-row justify-between items-center mb-10 gap-4">
+            <div className="text-center sm:text-left space-y-1">
+              <span className="text-[11px] font-extrabold text-brand-accent uppercase tracking-widest font-heading">
+                Expert Regimens
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-black text-brand-dark dark:text-white font-heading uppercase tracking-tight">
+                Value Combos & Skincare Kits
+              </h2>
+              <div className="w-16 h-1 bg-brand-blue rounded-full mx-auto sm:mx-0"></div>
+            </div>
+            <Link
+              to="/shop?search=combo"
+              className="flex items-center gap-1.5 text-xs font-bold text-brand-blue hover:text-brand-blue-dark uppercase tracking-wider font-heading border-b-2 border-brand-blue/30 pb-0.5 hover:border-brand-blue-dark transition-all dark:text-brand-blue-light dark:hover:text-white"
+            >
+              View All Combos <ArrowRight size={14} />
+            </Link>
+          </div>
+        </ScrollReveal>
+
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[...Array(3)].map((_, i) => (
+              <div
+                key={i}
+                className="bg-gray-100 rounded-lg border border-brand-border h-[420px] animate-pulse"
+              ></div>
+            ))}
+          </div>
+        ) : combos.length === 0 ? (
+          <div className="text-center py-10 bg-white dark:bg-zinc-900 border border-brand-border dark:border-zinc-800 rounded-xl">
+            <p className="text-xs text-brand-grey dark:text-zinc-450 font-medium">No combo packs found in catalog.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {combos.slice(0, 3).map((product, index) => {
+              const delays = ["", "delay-100", "delay-200"];
+              return (
+                <ScrollReveal key={product.id} delay={delays[index % 3]}>
                   <ProductCard product={product} />
                 </ScrollReveal>
               );
